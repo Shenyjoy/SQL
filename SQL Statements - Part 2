@@ -83,6 +83,6 @@ INSERT INTO TargetProducts(ProductID,ProductName, Price) VALUES(6,'Cupboard',300
 GO
 
 
-SELECT * FROM SourceProducts
-SELECT * FROM TargetProducts
+SELECT * FROM SourceProducts--Source - Input data
+SELECT * FROM TargetProducts-- Destination
 

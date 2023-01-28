@@ -69,7 +69,7 @@ select * from Persons1
 
 select getdate()
 
-
+/*Create a Table with constraints*/
 create table Persons2 (
 ID int NOT NULL PRIMARY KEY,
 LastName varchar(255) NOT NULL,
@@ -77,5 +77,6 @@ FirstName varchar(255) NOT NULL,
 Age int
 );
 
+/*Drop the Primary Key*/
 ALTER TABLE [dbo].[Persons2]
 DROP CONSTRAINT [PK__Persons2__3214EC27FBD202D9]

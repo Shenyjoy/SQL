@@ -1,0 +1,3 @@
+/*Create a Database*/
+create database Training
+Use [Training]

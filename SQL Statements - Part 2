@@ -1,0 +1,18 @@
+/Data Types in SQL*/
+
+create table tinyintdemo(id tinyint)
+
+insert into tinyintdemo values(1)
+select * from tinyintdemo
+
+/*Errors in inserting as values are negative and above 255
+insert into tinyintdemo values(-1)
+insert into tinyintdemo values(256)*/
+
+/*Alter table to change the column to smallint to add values that are negative and above 255*/
+alter table tinyintdemo 
+alter column id smallint
+
+insert into tinyintdemo values(-1)
+insert into tinyintdemo values(256)
+select * from tinyintdemo 

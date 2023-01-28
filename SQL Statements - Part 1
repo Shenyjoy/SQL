@@ -1,0 +1,25 @@
+/*** SQL Statements ***/
+/*Create and Use a Database*/
+create database Training
+Use [Training]
+
+/*Create a Table*/
+create table Persons(ID int NOT NULL, LastName varchar(255) NOT NULL,FirstName varchar(255) NOT NULL,Age int);
+
+/*Insert values into a Table*/
+insert into [dbo].[Persons] values(4,'Rahul','Reshma',43)
+insert into [dbo].[Persons] values(3,'Mahesh','Kajal',21)
+
+/*Update values in a Table*/
+update [dbo].[Persons] set ID=2 where FirstName='Rahul'
+
+/*Delete values from a Table*/
+delete from [dbo].[Persons] where ID=1
+
+--/*Truncate -"where" clause cannot be used-  Delete all the data very fast - No Rollback can be done as it does not log anything
+--  Delete - Logs all the information in the ldf file - Rollback can be done*/
+truncate table [dbo].[Persons]
+
+/*Alter colums to add a constraint in a Table*/
+Alter Table [dbo].[Persons]
+ADD UNIQUE(ID);

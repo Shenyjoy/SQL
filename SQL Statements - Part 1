@@ -20,6 +20,62 @@ delete from [dbo].[Persons] where ID=1
 --  Delete - Logs all the information in the ldf file - Rollback can be done*/
 truncate table [dbo].[Persons]
 
-/*Alter colums to add a constraint in a Table*/
+/*Alter columns to add a constraint in a Table*/
 Alter Table [dbo].[Persons]
 ADD UNIQUE(ID);
+
+create table Persons1 (
+ID int NOT NULL PRIMARY KEY,
+LastName varchar(255) NOT NULL,
+FirstName varchar(255) NOT NULL,
+Age int
+);
+
+select * from Persons1;
+insert into Persons1 values(1,'Jai','Yash',35)
+insert into [dbo].[Persons1] values(3,'Ali','Hadia',23)
+insert into [dbo].[Persons1] values(2,'Tis','Liwa',34)
+
+create table Orders(
+OrderID int NOT NULL PRIMARY KEY,
+OrderNumber int NOT NULL,
+PersonID int FOREIGN KEY REFERENCES Persons1(ID)
+);
+
+drop table Orders
+
+insert into Orders values(1,101,1)
+insert into Orders values(2,201,2)
+select * from Orders;
+
+alter table Persons1
+ADD constraint Age CHECK(Age>=18);
+
+insert into Persons1 values(5,'Jai','Yash',35)
+insert into Persons1 values(6,'Jaiyesh','Yashi',3)
+select * from Persons1
+
+alter table Persons1
+ADD country varchar(15)
+
+alter table Persons1
+ADD CONSTRAINT country
+DEFAULT 'India' for country;
+
+insert into Persons1 values(6,'Nambiar','Kush',20,DEFAULT);
+insert into Persons1 ([ID],[LastName],[FirstName],[Age])values(7,'Naina','Kiran',20);
+
+select * from Persons1
+
+select getdate()
+
+
+create table Persons2 (
+ID int NOT NULL PRIMARY KEY,
+LastName varchar(255) NOT NULL,
+FirstName varchar(255) NOT NULL,
+Age int
+);
+
+ALTER TABLE [dbo].[Persons2]
+DROP CONSTRAINT [PK__Persons2__3214EC27FBD202D9]

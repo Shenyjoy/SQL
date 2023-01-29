@@ -1,0 +1,140 @@
+select * from [dbo].[Customer]
+select * from [dbo].[Order]
+select * from [dbo].[OrderItem]
+select * from [dbo].[Product]
+select * from [dbo].[Supplier]
+
+select * from [dbo].[Customer] where Country='USA' AND City='San Francisco'
+select * from [dbo].[Customer] where Country='USA' OR City='San Francisco'
+
+select * from [dbo].[Customer] where NOT(Country='USA' AND City='San Francisco')
+
+select * from [dbo].[Customer2]
+select * from [dbo].[Customer1]
+
+/*UNION ALL - All rows *** UNION - only distinct rows are displayed, duplicates are removed*/
+select * from [dbo].[Customer2]
+union all
+select * from [dbo].[Customer1]
+
+select * from [dbo].[Customer2]
+union
+select * from [dbo].[Customer1]
+
+/*INTERSECT - only matchoing rows are displayed*/
+select * from [dbo].[Customer2]
+intersect
+select * from [dbo].[Customer1]
+
+/*EXCEPT - only rows that are in first table not matching will be  displayed*/
+select * from [dbo].[Customer2]
+except
+select * from [dbo].[Customer1]
+
+select * from [dbo].[Customer1]
+except
+select * from [dbo].[Customer2]
+
+/*LIKE - Use the wildcard %*/
+select * from [dbo].[Customer] where City Like '%San%'
+select * from [dbo].[Customer] where City Like '%San' -- ending with San - (japan)% + San
+select * from [dbo].[Customer] where City Like 'San%' --starting with San - San + %(Francisco)
+
+
+select * from [dbo].[Customer] where lower(City) Like 'sco%' 
+select City, lower(City), upper(City) from [dbo].[Customer] where City like '%sco'
+
+select * from [dbo].[Customer] where City Like 'San Francisc_' -- only one character
+
+select * from [dbo].[Order] where OrderDate between '2013-01-03' and '2013-02-03' order by TotalAmount
+
+/*GROUP BY */
+select * from [dbo].[Order] order by CustomerId
+select * from [dbo].[Order] order by CustomerId, OrderDate
+
+--Find out the total amount spent by each customer
+select CustomerId, sum(TotalAmount) as TotalAmountSpent, 
+count(*) as NumberOrders, 
+min(TotalAmount) as MinAmtSpent,
+max(TotalAmount) as MaxAmtSpent
+from [dbo].[Order]
+group by CustomerId
+order by TotalAmountSpent desc
+
+--Having Clause will only work on the aggregation of data, you should have a group by clause
+--Find out the top 5 customers with maximum total amount spent
+select top 5 CustomerId, sum(TotalAmount) as TotalAmountSpent, 
+count(*) as NumberOrders, 
+min(TotalAmount) as MinAmtSpent,
+max(TotalAmount) as MaxAmtSpent
+from [dbo].[Order]
+--where
+group by CustomerId
+--having
+order by TotalAmountSpent desc
+
+select avg(TotalAmount) from [dbo].[Order] --1631.877819
+
+select CustomerId, sum(TotalAmount) as TotalAmountSpent, 
+count(*) as NumberOrders, 
+min(TotalAmount) as MinAmtSpent,
+max(TotalAmount) as MaxAmtSpent
+from [dbo].[Order]
+--where
+group by CustomerId
+--having
+having avg(TotalAmount)>= 1631.877819
+order by TotalAmountSpent desc
+
+select CustomerId, sum(TotalAmount) as TotalAmountSpent, 
+count(*) as NumberOrders, 
+min(TotalAmount) as MinAmtSpent,
+max(TotalAmount) as MaxAmtSpent
+from [dbo].[Order]
+where CustomerId between 1 and 10
+--where
+group by CustomerId
+--having
+having sum(TotalAmount)>= 1631.877819
+order by TotalAmountSpent desc
+
+/* -- SQL Query Execution Order
+FROM Clause in SQL
+WHERE Clause in SQL
+Group By in SQL
+HAVING Clause in SQL
+ORDER By Clause in SQL
+Alias in SQL */
+
+--Temporary Tables:
+--Local Temp Table
+CREATE TABLE #Customer1(
+	[Id] [int] NOT NULL,
+	[FirstName] [nvarchar](40) NOT NULL,
+	[Country] [nvarchar](40) NULL)
+
+insert into #Customer1 values(1,'Ashok','USA')
+
+select * from #Customer1
+--GlobalSQL Basics Temp Table
+CREATE TABLE ##Customer1(
+	[Id] [int] NOT NULL,
+	[FirstName] [nvarchar](40) NOT NULL,
+	[Country] [nvarchar](40) NULL)
+
+--Example of using a temp table
+select * into #CustAvg from
+
+(select CustomerId, sum(TotalAmount) as TotalAmountSpent, 
+count(*) as NumberOrders, 
+min(TotalAmount) as MinAmtSpent,
+max(TotalAmount) as MaxAmtSpent
+from [dbo].[Order]
+where CustomerId between 1 and 10
+--where
+group by CustomerId
+--having
+having sum(TotalAmount)>= 1631.877819) a
+
+--You can just run the below query based on the temp table created above
+select * from #CustAvg

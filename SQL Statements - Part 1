@@ -1,4 +1,4 @@
-/*** SQL Statements ***/
+/*** SQL Statements- Create, Insert, Select ***/
 /*Create and Use a Database*/
 create database Training
 Use [Training]

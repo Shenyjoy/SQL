@@ -1,0 +1,52 @@
+--Joins - Data in multiple tables
+
+select top 2 * from [dbo].[Customer]
+select top 2 * from [dbo].[Order]
+select top 2 * from [dbo].[OrderItem]
+
+select *
+from [dbo].[Customer] C join [dbo].[Order] O
+on C.Id=O.CustomerId
+join [dbo].[OrderItem] I
+on O.Id = I.OrderId
+
+/*LEFT JOIN*/
+select * from [dbo].[Customer1]
+select * from [dbo].[Customer2]
+
+select * from [dbo].[Customer1] C1 join [dbo].[Customer2] C2
+on C1.Id=C2.Id
+
+--LEFT OUTER JOIN
+select * from [dbo].[Customer1] C1 left join [dbo].[Customer2] C2
+on C1.Id=C2.Id
+--RIGHT OUTER JOIN
+select * from [dbo].[Customer1] C1 right join [dbo].[Customer2] C2
+on C1.Id=C2.Id
+--FULL JOIN - DISTINCT UNION of LEFT, OUTER and FULL JOIN wherever not matching it will replace with NULL values
+select * from [dbo].[Customer1] C1 right join [dbo].[Customer2] C2
+on C1.Id=C2.Id
+
+select * from [dbo].[Customer1] C1 FULL join [dbo].[Customer2] C2
+on C1.Id=C2.Id
+
+select * from [dbo].[Customer1] C1 FULL join [dbo].[Customer2] C2
+on C1.Id=C2.Id
+
+--CROSS JOIN - CARTESIAN PRODUCT OF BOTH TABLES
+select * from [dbo].[Customer1] C1 CROSS join [dbo].[Customer2] C2
+
+-- Display additional Rows from Both Tables use the Join.
+
+select CustomerId,C.FirstName, sum(TotalAmount) as TotalAmountSpent, 
+count(*) as NumberOrders, 
+min(TotalAmount) as MinAmtSpent,
+max(TotalAmount) as MaxAmtSpent
+from [dbo].[Order] O
+Join Customer C on C.ID=O.CustomerID
+where CustomerId between 1 and 10
+--where
+group by CustomerId, C.FirstName
+--having
+having sum(TotalAmount)>= 1631.877819
+order by TotalAmountSpent desc

@@ -1,1 +1,120 @@
 SQL_Server_Functions
+Use TrainingClass
+--Best practise is to specify the number of columns and rows to be shown to improve performance
+select top 1000 * from [dbo].[Order]
+select count(*) from [dbo].[Order]  -- 830 - Slower if many rows and columns- Checks for all columns
+select count(1) from [dbo].[Order]  -- 830 - unique Values - Checks only for Primary key column
+
+Scalar Functions
+select count(*) as [Count],avg(TotalAmount) as [Avg], min(TotalAmount) as [Min], max(TotalAmount) as[Max],sum(TotalAmount) as [Sum] from [dbo].[Order]
+
+select * into #order from [dbo].[Order] --Temp table
+
+Checksum is a way of identifying a unique row - Data validation 
+Consumed datya from the source and ensure that no value is missed.
+
+select *, checksum(Id) as [checksum], BINARY_CHECKSUM(Id) as [binary_checksum],
+checksum(TotalAmount) as [checksum], BINARY_CHECKSUM(TotalAmount) as [binary_checksum] 
+from [dbo].[Order] order by TotalAmount
+
+select checksum_agg(Id) as [checksum_agg]
+from [dbo].[Order] 
+
+select STDEV(TotalAmount) as [stdev], STDEVP(TotalAmount) as[stdevp] from [dbo].[Order] 
+select var(TotalAmount) as [var], varp(TotalAmount) as[varp] from [dbo].[Order] 
+
+select DATEFROMPARTS(2028,10,31) as [datefromparts]
+
+SELECT DATETIMEOFFSETFROMPARTS ( 2010, 12, 31, 14, 23, 23, 0, 12, 0, 7 ) AS Result;  
+STRING Functions
+select * from [dbo].[Customer]
+select *, upper(FirstName) as [First Name], reverse(FirstName) as [Reverse],  lower(FirstName) as [Lower]  from [dbo].[Customer]
+
+select *, 
+REVERSE(lower(upper(FirstName))) as [Reversed], LEN(FirstName) as [LENGTH] from [dbo].[Customer]
+
+select SUBSTRING('SQL Tutorial', 1,3) as ExtractString
+
+--CAST supports multi datatypes
+select getdate()
+select cast(getdate() as date)
+select cast(getdate() as varchar)
+
+-- CONVERT is not as efficient as CAST
+select CONVERT(varchar, getdate(), 100) as [date_conv]
+select CONVERT(varchar, getdate(), 101) as [date_conv]
+select CONVERT(varchar, getdate(), 106) as [date_conv]
+select CONVERT(varchar, getdate(), 120) as [date_conv]
+
+
+Compare the values - if present or not
+1. CASE Statement - easier to understand
+2. IIF Statement
+select * from [dbo].[Customer] where Country='USA'
+
+select * 
+, case 
+	when Country='USA' then 'Home Country'
+	when Country <> 'USA' then 'Not from Home Country'
+	else 'inside else'
+	end as Country_Case
+,
+IIF(Country='USA' ,'Home Country', 'Not from Home Country') as Country_IIF
+from [dbo].[Customer]
+
+--Trying and then cast it
+select TRY_CAST(getdate() as date)
+
+select PARSE('Monday, 13 December 2010' AS datetime2 using 'en-US') AS Result
+
+Window Functions - They must have an over clause and order by
+
+select Id, FirstName, 
+	lag(FirstName) over (order by id) as [lag],
+	lead(FirstName) over (order by id) as [lead]
+	from [dbo].[Customer]
+
+
+select * from
+[dbo]. [Customer] C join [dbo].[Order] O
+on C.Id=o.CustomerId
+order by C.Id
+
+Find out first order and subsequent order placed by the customer
+select C.Id, C.FirstName, C.LastName, O.OrderDate, O.TotalAmount
+,	--lag(OrderDate) over (partition by C.Id order by OrderDate) as [lag],
+	lead(OrderDate) over (partition by C.Id order by OrderDate) as [lead]
+	from
+[dbo]. [Customer] C join [dbo].[Order] O
+on C.Id=o.CustomerId
+
+ First Order and Last Ordre placed by the customer for every row
+display when customer placed first order by customer for all rows fro each customer
+display when customer placed last order by customer for all rows fro each customer
+select C.Id, C.FirstName, C.LastName, O.OrderDate, O.TotalAmount
+,	--lag(OrderDate) over (partition by C.Id order by OrderDate) as [lag],
+	FIRST_VALUE(OrderDate) over (partition by C.Id order by OrderDate) as [lead],
+	LAST_VALUE(OrderDate) over (partition by C.Id order by OrderDate) as [lead]
+	from
+[dbo]. [Customer] C join [dbo].[Order] O
+on C.Id=o.CustomerId
+
+unbounded Preceding - Rows present abouve above current row
+ Current
+Unbounded Following - 
+
+select C.Id, C.FirstName, C.LastName, O.OrderDate,
+	lead(OrderDate) over (partition by C.Id order by OrderDate) as [lead],
+	FIRST_VALUE(OrderDate) over (partition by C.Id order by OrderDate) as [first],
+	LAST_VALUE(OrderDate) 
+		over (partition by C.Id order by OrderDate 
+	rows between unbounded preceding and unbounded following) as [last_values]
+
+	from [dbo]. [Customer] C join [dbo].[Order] O
+on C.Id=o.CustomerId
+
+select *
+, CONCAT(FirstName,LastName) as [FullName] from [dbo].[Customer] 
+
+select *
+, CONCAT_WS('--',FirstName,LastName) as [FullName] from [dbo].[Customer] 

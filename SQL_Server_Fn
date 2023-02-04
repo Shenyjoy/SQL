@@ -118,3 +118,15 @@ select *
 
 select *
 , CONCAT_WS('--',FirstName,LastName) as [FullName] from [dbo].[Customer] 
+
+--REPLACE
+select REPLACE('SQL is interesting', 'interesting','Fun')
+-ASCII
+select ASCII('a'), ASCII('A')
+
+-- Find out the ASCII value of third character in the firstname 
+
+select FirstName, SUBSTRING(FirstName,3,1),(ASCII(SUBSTRING(FirstName,3,1)))
+AS
+ASCII_VALUE_OF_FYRSTNAME
+from [dbo].[Customer] 

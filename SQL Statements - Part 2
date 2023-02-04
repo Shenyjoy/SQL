@@ -19,6 +19,13 @@ insert into tinyintdemo values(-1)
 insert into tinyintdemo values(256)
 select * from tinyintdemo 
 
+--Deleting duplicates can be done by Row_number or autoincrementing
+create table #duplicates(id int,[value] varchar(10))
+insert into #duplicates values(1,'a')
+select * from #duplicates
+
+alter table #duplicates
+ADD id_temp int IDENTITY(1,1)
 
 CREATE TABLE dbo.MyTable  
 (  

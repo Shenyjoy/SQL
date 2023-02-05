@@ -132,56 +132,191 @@ ASCII_VALUE_OF_FYRSTNAME
 from [dbo].[Customer] 
 
 
----
---CREATE TABLE #Cars
---(
---id INT,
---name VARCHAR(50) NOT NULL,
---company VARCHAR(50) NOT NULL,
---power INT NOT NULL
---)
+------------------Second Part--------------------------------
+--Mathematical functions----------
+--select LOG(2), LOG10(2)
+--select square(square(2))
+--select abs(4), abs(-4), abs(-11.00)
+--select ceiling(11.6) --12
+--select ceiling(11.4), ceiling(11.01)
+--select floor(11.6), floor(11.4)
+--select round(12.567890,2),round(12.567890,1)
+--select power(2,3),power(4.2,3)
+--select day(getdate())
+--select DATEADD(year,5,getdate())
+--select DATEADD(month,5,getdate())
+--select DATEDIFF(day,'2023-07-05 19:02:34.300', getdate())
+--select DATEDIFF(month,'2023-07-05 19:02:34.300', getdate())
+--select datepart(day,getdate()), datepart(QQ,getdate()) as [QUARTER], datepart(QQ,getdate()+120),datepart(DY,getdate()) AS [DAY],datepart(DW,getdate())
 
---INSERT INTO #Cars
---VALUES
---(1, 'Corrolla', 'Toyota', 1800),
---(2, 'City', 'Honda', 1500),
---(3, 'C200', 'Mercedez', 2000),
---(4, 'Vitz', 'Toyota', 1300),
---(5, 'Baleno', 'Suzuki', 1500),
---(6, 'C500', 'Mercedez', 5000),
---(7, '800', 'BMW', 8000),
---(8, 'Mustang', 'Ford', 5000),
---(9, '208', 'Peugeot', 5400),
---(10, 'Prius', 'Toyota', 3200),
---(11, 'Atlas', 'Volkswagen', 5000),
---(12, '110', 'Bugatti', 8000),
---(13, 'Landcruiser', 'Toyota', 3000),
---(14, 'Civic', 'Honda', 1800),
---(15, 'Accord', 'Honda', 2000)
---(16, 'Galardo', 'Lamborgini', 8000)
+--RANK FUNCTIONS-assigning value based on criteria
+--rank - Will skip rankings
+CREATE TABLE #Cars
+(
+id INT,
+name VARCHAR(50) NOT NULL,
+company VARCHAR(50) NOT NULL,
+power INT NOT NULL
+)
+
+INSERT INTO #Cars
+VALUES
+(1, 'Corrolla', 'Toyota', 1800),
+(2, 'City', 'Honda', 1500),
+(3, 'C200', 'Mercedez', 2000),
+(4, 'Vitz', 'Toyota', 1300),
+(5, 'Baleno', 'Suzuki', 1500),
+(6, 'C500', 'Mercedez', 5000),
+(7, '800', 'BMW', 8000),
+(8, 'Mustang', 'Ford', 5000),
+(9, '208', 'Peugeot', 5400),
+(10, 'Prius', 'Toyota', 3200),
+(11, 'Atlas', 'Volkswagen', 5000),
+(12, '110', 'Bugatti', 8000),
+(13, 'Landcruiser', 'Toyota', 3000),
+(14, 'Civic', 'Honda', 1800),
+(15, 'Accord', 'Honda', 2000),
+(16, 'Galardo', 'Lamborgini', 8000)
+
+select * from #Cars
 
 select *
-, rank() over(order by [power] desc) as [rank] 
-, dense_rank() over(order by [power] desc) as [dense_rank] 
-, row_number() over(order by [power] desc) as [row_num] 
-, rank() over(partition by company  order by [power] desc) as [partition_rank] 
-, dense_rank() over(partition by company  order by [power] desc) as [partition_dense_rank] 
-, row_number() over(partition by company order by [power] desc) as [partition_row_num], 
-, ntile(7) over( order by [power] desc) as [ntile]
+, rank() over(order by [power] desc) as [rank]
+, dense_rank() over(order by [power] desc) as [dense_rank]
+, row_number() over(order by [power] desc) as [row_num]
+, rank() over(partition by company order by [power] desc) as [partition_rank]
+, dense_rank() over(partition by company order by [power] desc) as [partition_dense__rank]
+, row_number() over(partition by company order by [power] desc) as [partition_row_number_rank]
+,ntile(17) over(order by [power] desc) as [ntile]
 from #Cars
-create function cubed (@id int)
-returns int as 
-begin
-    return power(@id,3) 
-end;
 
-CREATE FUNCTION [getCustomerInfo] (@Id int)
-RETURNS TABLE AS
-RETURN (select * from [dbo].[Customer] where Id = @Id)
-CREATE FUNCTION [database_name].function_name (parameters)
-RETURNS @Table TABLE ()  AS
-BEGIN 
-    INSERT INTO @Table 
-    select statement 
-    RETURN
+--USER DEFINED FUNCTIONS
+--SCALAR VALUED - Returns only one value
+CREATE FUNCTION cubed (@id int)
+RETURNS int AS
+BEGIN
+	return power(@id,4)
+	
 END
+
+--Execute the function
+select dbo.cubed(3)
+
+--Create a function that will take any string value and converts all the characters to lower except first character ABCDE-Abcde
+
+--INLINE TABLE VALUED FUNCTION - Returns a table
+select * from dbo.Customer where Id=1
+
+CREATE FUNCTION [getCustomerInfo] (@id int)
+RETURNS TABLE AS
+	return(select * from [dbo].[Customer] where Id=@id)
+
+select * from [getCustomerInfo](1)
+
+--MULTI-TABLED VALUED FUNCTION - Returns a table
+CREATE FUNCTION [database_name].function_name (parameters)
+RETURNS @Table TABLE() AS
+BEGIN
+	INSERT INTO @Table
+	select statement
+	RETURN
+END
+
+-- 
+select STUFF('Foxit', 4,2,'tv')
+select STUFF('abcdef',2,3,'ijklmn');
+select Id,FirstName,stuff(FirstName,2,3,'000') from [dbo].[Customer]
+
+--VIEWS--Virtual Table----
+Create View [vWCustomer_info]
+as 
+select Id,FirstName from [dbo].[Customer]
+
+Alter View [vWCustomer_info]
+as 
+select Id,FirstName,City,Country from [dbo].[Customer]
+
+select * from vWCustomer_info
+
+--Materialised Views - if we create an index on the views then the view will no longer be virtual
+
+--STORED PROCEDURES -- STORED PROC - SP - Faster as the piece of code is executed and the execution plan is stored
+--Prepared SQL Code that can be stored and used
+
+select * from [dbo].[Customer]
+select * from [dbo].[Order]
+
+-- Create a Stored Proc to find the total Sum spent by the customer  
+CREATE PROCEDURE 
+spCustomerorderInfo as
+select C.Id, min(FirstName) as [FN], min(LastName) as [LN], sum(TotalAmount) as [sum]
+from [dbo].[Customer] C join [dbo].[Order] O
+on C.Id=O.CustomerID
+group by C.Id
+order by [sum] desc
+
+--Execute a Stored Procedure in 3 ways
+exec spCustomerorderInfo
+spCustomerorderInfo
+execute spCustomerorderInfo
+
+ALTER PROCEDURE 
+spCustomerorderInfo as
+select C.Id, min(FirstName) as [FN], min(LastName) as [LN], sum(TotalAmount) as [sum]
+from [dbo].[Customer] C join [dbo].[Order] O
+on C.Id=O.CustomerID
+group by C.Id
+
+
+-- BuiltIn stored Procedure
+sp_spaceused '[dbo].[Customer]'
+sp_helptext '[dbo].[spCustomerorderInfo]'
+
+--Output Stored Procedure - Returns some value
+
+CREATE PROCEDURE spGetCustomerorderInfo
+@Id int
+AS
+select C.Id, min(FirstName) as [FN], min(LastName) as [LN], sum(TotalAmount) as [sum]
+from [dbo].[Customer] C join [dbo].[Order] O
+on C.Id=O.CustomerID
+where C.Id=@Id
+group by C.Id
+
+exec spGetCustomerorderInfo 1
+
+---Functions, Views, SP
+--Functions and Views are run suing the select statement
+select dbo.cubed(3) --Scalar Function
+select * from [getCustomerInfo](2)--inline table valued function
+select * from vWCustomer_info --View
+
+exec [dbo].[spCustomerorderInfo]
+
+--Temp Table is for Adhoc Analysis and it can be dropped 
+
+
+---CTE - Common Table Expressions ---Method used to query the data only
+--1. Declaring a CTE
+--2. Select a CTE/querying
+--execute both together
+
+with cte as
+(select C.Id, min(FirstName) as [FN], min(LastName) as [LN], sum(TotalAmount) as [sum]
+from [dbo].[Customer] C join [dbo].[Order] O
+on C.Id=O.CustomerID
+group by C.Id)
+
+select * from cte order by [sum] desc
+	
+--Multiple CTE's can also be added, with each CTE having a transformation
+with cte as
+(select C.Id, min(FirstName) as FirstName, min(LastName) as LastName, sum(TotalAmount) as [sum]
+from [dbo].[Customer] C join [dbo].[Order] O
+on C.Id=O.CustomerID
+group by C.Id)
+
+,cte2 as (select Id, Upper(FirstName) FirstName, Upper(LastName) Lastname, [SUM]  from cte)
+--,cte3 as (select * from cte)
+--,cte4 as ()
+select * from cte2 order by [sum] desc
